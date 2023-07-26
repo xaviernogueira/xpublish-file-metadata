@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "xpublish-netcdf"
+version = "0.1.0"
+description = ""
+authors = ["xaviernogueira <xavier.rojas.nogueira@gmail.com>"]
+readme = "README.md"
+packages = [{include = "xpublish_netcdf"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+xpublish = "^0.3.2"
+netcdf4 = "^1.6.4"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+httpx = "^0.24.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
