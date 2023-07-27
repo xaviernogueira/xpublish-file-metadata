@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "xpublish-netcdf"
 version = "0.1.0"
-description = ""
+description = "Two NetCDF plugins (router and provider) for xpublish"
 authors = ["xaviernogueira <xavier.rojas.nogueira@gmail.com>"]
 readme = "README.md"
 packages = [{include = "xpublish_netcdf"}]

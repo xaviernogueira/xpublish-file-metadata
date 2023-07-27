@@ -53,17 +53,17 @@ class NetcdfPlugin(Plugin):
 
         @router.get(f'/{NETCDF_ATTRS_KEY}')
         def list_attrs(
-            dataset: xr.Dataset = Depends(deps.dataset),
-            cache: cachey.Cache = Depends(deps.cache),
-        ) -> list:
+            dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
+            cache: Annotated[cachey.cache, Depends(deps.cache)],
+        ) -> list[str]:
             """Lists NetCDF attributes that can be accessed via the API."""
             nc_dataset = get_nc_dataset(dataset, cache)
             return list_nc_attrs(nc_dataset)
 
         @router.get(f'/{NETCDF_ATTRS_KEY}/json')
         def all_attr_values(
-            dataset: xr.Dataset = Depends(deps.dataset),
-            cache: cachey.Cache = Depends(deps.cache),
+            dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
+            cache: Annotated[cachey.cache, Depends(deps.cache)],
         ) -> JSONResponse:
             """Lists NetCDF attributes that can be accessed via the API."""
             nc_dataset = get_nc_dataset(dataset, cache)
@@ -78,10 +78,10 @@ class NetcdfPlugin(Plugin):
                 ),
             )
 
-        @router.get('/' + NETCDF_ATTRS_KEY + '/{name}')
+        @router.get('/{name}')
         def get_single_attr(
-            dataset: xr.Dataset = Depends(deps.dataset),
-            cache: cachey.Cache = Depends(deps.cache),
+            dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
+            cache: Annotated[cachey.cache, Depends(deps.cache)],
             name: str = Path(description='NetCDF attribute name to retrieve.'),
         ) -> str:
             """Returns the value of a NetCDF attribute."""
