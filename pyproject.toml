@@ -1,16 +1,15 @@
 [tool.poetry]
-name = "xpublish-netcdf"
+name = "xpublish-file-metadata"
 version = "0.1.0"
-description = "Two NetCDF plugins (router and provider) for xpublish"
+description = "A dataset router plugin for providing serving file metadata"
 authors = ["xaviernogueira <xavier.rojas.nogueira@gmail.com>"]
 readme = "README.md"
-packages = [{include = "xpublish_netcdf"}]
+packages = [{include = "xpublish_file_metadata"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 xpublish = "^0.3.2"
 netcdf4 = "^1.6.4"
-kerchunk = "^0.1.2"
 
 
 [tool.poetry.group.dev.dependencies]
