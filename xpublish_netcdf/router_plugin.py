@@ -13,7 +13,6 @@ from typing import (
     Sequence,
     Annotated,
 )
-from xpublish.utils.api import JSONResponse
 
 from xpublish import (
     Dependencies,
@@ -24,22 +23,37 @@ from xpublish import (
 from .shared import (
     NETCDF_ATTRS_KEY,
 )
-from .utils import (
+from .router_utils import (
     get_nc_dataset,
-    list_nc_attrs,
+    get_nc_attrs_dict,
     get_nc_attr,
 )
 
 logger = logging.getLogger('netcdf4_api')
 
 
-class NetcdfPlugin(Plugin):
+class NetcdfRouterPlugin(Plugin):
     """Adds NetCDF4 based endpoints for datasets"""
 
     name: str = 'netcdf'
 
     dataset_router_prefix: str = '/netcdf'
     dataset_router_tags: Sequence[str] = ['netcdf']
+
+    def __init__(
+        self,
+        hide_attrs: Sequence[str] = None,
+    ):
+        super().__init__()
+        if hide_attrs:
+            self.__hide_attrs = list(hide_attrs)
+        else:
+            self.__hide_attrs = []
+
+    @property
+    def hide_attrs(self) -> list[str]:
+        """List of NetCDF attributes to hide from the API."""
+        return self.__hide_attrs
 
     @hookimpl
     def dataset_router(
@@ -52,33 +66,35 @@ class NetcdfPlugin(Plugin):
         )
 
         @router.get(f'/{NETCDF_ATTRS_KEY}')
-        def list_attrs(
+        def get_attr_values(
+            dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
+            cache: Annotated[cachey.cache, Depends(deps.cache)],
+        ) -> dict[str, str]:
+            """Lists NetCDF attributes that can be accessed via the API."""
+            nc_dataset = get_nc_dataset(dataset, cache)
+            return get_nc_attrs_dict(
+                dataset,
+                cache,
+                nc_dataset,
+                self.hide_attrs,
+            )
+
+        @router.get(f'/{NETCDF_ATTRS_KEY}/names')
+        def get_attr_names(
             dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
             cache: Annotated[cachey.cache, Depends(deps.cache)],
         ) -> list[str]:
             """Lists NetCDF attributes that can be accessed via the API."""
             nc_dataset = get_nc_dataset(dataset, cache)
-            return list_nc_attrs(nc_dataset)
-
-        @router.get(f'/{NETCDF_ATTRS_KEY}/json')
-        def all_attr_values(
-            dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
-            cache: Annotated[cachey.cache, Depends(deps.cache)],
-        ) -> JSONResponse:
-            """Lists NetCDF attributes that can be accessed via the API."""
-            nc_dataset = get_nc_dataset(dataset, cache)
-            nc_attrs = list_nc_attrs(nc_dataset)
-            # TODO: have a utility function to do and cache this
-            return JSONResponse(
-                dict(
-                    zip(
-                        nc_attrs,
-                        [get_nc_attr(attr, nc_dataset) for attr in nc_attrs],
-                    ),
-                ),
+            nc_attrs = get_nc_attrs_dict(
+                dataset,
+                cache,
+                nc_dataset,
+                self.hide_attrs,
             )
+            return list(nc_attrs.keys())
 
-        @router.get('/{name}')
+        @router.get(f'/{NETCDF_ATTRS_KEY}' + '/{name}')
         def get_single_attr(
             dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
             cache: Annotated[cachey.cache, Depends(deps.cache)],
@@ -86,7 +102,12 @@ class NetcdfPlugin(Plugin):
         ) -> str:
             """Returns the value of a NetCDF attribute."""
             nc_dataset = get_nc_dataset(dataset, cache)
-            nc_attrs = list_nc_attrs(nc_dataset)
+            nc_attrs = get_nc_attrs_dict(
+                dataset,
+                cache,
+                nc_dataset,
+                self.hide_attrs,
+            )
 
             if name not in nc_attrs:
                 raise HTTPException(
@@ -97,4 +118,8 @@ class NetcdfPlugin(Plugin):
                         f'to list available attributes.'
                     ),
                 )
-            return get_nc_attr(name, nc_dataset)
+            return get_nc_attr(
+                name,
+                nc_attrs,
+                self.hide_attrs,
+            )
