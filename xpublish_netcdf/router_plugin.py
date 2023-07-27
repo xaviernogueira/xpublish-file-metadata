@@ -9,11 +9,11 @@ from fastapi import (
     APIRouter,
     HTTPException,
 )
-from starlette.responses import Response
-
-import xpublish
+from typing import (
+    Sequence,
+    Annotated,
+)
 from xpublish.utils.api import JSONResponse
-from xpublish.utils.cache import CostTimer
 
 from xpublish import (
     Dependencies,
