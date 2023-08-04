@@ -1,1 +1,1 @@
-from .router_plugin import NetcdfRouterPlugin
+from .plugin import FileMetadataPlugin

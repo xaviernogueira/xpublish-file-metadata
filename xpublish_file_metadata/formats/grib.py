@@ -1,0 +1,5 @@
+import grib
+
+
+class GridFileMetadata:
+    ...

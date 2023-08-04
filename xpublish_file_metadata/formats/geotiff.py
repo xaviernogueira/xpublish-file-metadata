@@ -1,0 +1,5 @@
+import rasterio
+
+
+class GeoTiffFileMetadata:
+    ...
