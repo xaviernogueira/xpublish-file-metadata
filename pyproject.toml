@@ -29,11 +29,11 @@ hdf5 = ["h5py"]
 geotiff = ["rasterio"]
 grib = ["cfgrib"]
 
-[project.entry-points.xpublish_file_metadata_formats]
-netcdf = "xpublish_file_metadata.formats.netcdf:NetcdfFileMetadata"
-hdf5 = "xpublish_file_metadata.formats.hdf5:Hdf5FileMetadata"
-geotiff = "xpublish_file_metadata.formats.geotiff:GeoTiffFileMetadata"
-grib = "xpublish_file_metadata.formats.grib:GribFileMetadata"
+[tool.poetry.plugins."xpublish_file_metadata.formats"]
+"netcdf" = "xpublish_file_metadata.formats.netcdf:NetcdfFileMetadata"
+"hdf5" = "xpublish_file_metadata.formats.hdf5:Hdf5FileMetadata"
+"geotiff" = "xpublish_file_metadata.formats.geotiff:GeoTiffFileMetadata"
+"grib" = "xpublish_file_metadata.formats.grib:GribFileMetadata"
 
 [build-system]
 requires = ["poetry-core"]
