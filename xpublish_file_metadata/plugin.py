@@ -3,9 +3,11 @@ import pkg_resources
 import cachey
 import xarray as xr
 from pydantic import BaseModel
+from pathlib import Path
 from fastapi import (
     APIRouter,
     Depends,
+    HTTPException,
 )
 from xpublish import (
     Plugin,
@@ -18,6 +20,7 @@ from typing import (
     Sequence,
     Annotated,
     Protocol,
+    Union,
 )
 from .shared import (
     FileFormats,
@@ -42,6 +45,7 @@ class FormatProtocol(Protocol):
         self,
         dataset: xr.Dataset,
         cache: cachey.Cache,
+        hide_attrs: list[str],
     ) -> FileMetadata:
         """Return the file metadata of the dataset."""
         ...
@@ -84,15 +88,20 @@ class FileMetadataPlugin(Plugin):
 
     def __init__(
         self,
-        hide_attrs: Sequence[str] = None,
+        hide_attrs: Union[list[str], dict[FileFormats, list[str]]] = None,
     ) -> None:
         super().__init__()
-        if hide_attrs:
-            self.__hide_attrs = list(hide_attrs)
-        else:
-            self.__hide_attrs = []
 
         self.__formats: dict[FileFormats, FormatProtocol] = load_file_formats()
+
+        self.__hide_attrs: dict[FileFormats, list[str]] = {}
+        if not hide_attrs:
+            hide_attrs = {}
+        for format in self.loaded_formats.keys():
+            if isinstance(hide_attrs, list):
+                self.__hide_attrs[format] = list(hide_attrs)
+            elif isinstance(hide_attrs, dict):
+                self.__hide_attrs[format] = hide_attrs.get(format, [])
 
     @property
     def hide_attrs(self) -> dict[FileFormats, str]:
@@ -115,33 +124,76 @@ class FileMetadataPlugin(Plugin):
             tags=self.dataset_router_tags,
         )
 
-        def get_metadata(
-            dataset: Annotated[xr.Dataset, Depends(deps.get_dataset)],
-        ) -> FileMetadata:
-            """Gets and caches the metadata of the dataset."""
-            raise NotImplementedError
+        @router.get('/supported')
+        def supported_formats() -> list[str]:
+            """Shows which file formats have metadata support.
+
+            NOTE: This depends on which optional dependencies are installed!
+            """
+            return list(self.loaded_formats.keys())
 
         @router.get('/format')
-        def get_file_format(
+        def file_format(
             dataset: Annotated[xr.Dataset, Depends(deps.get_dataset)],
         ) -> str:
-            """Return the file format of the dataset."""
-            raise NotImplementedError
+            """Return the file format of the dataset.
+
+            NOTE: This is not the precise format, but rather the format key
+            in relationship to the xpublish-file-metadata plugin.
+            """
+            extension = Path(dataset.encoding['source']).suffix
+            try:
+                return EXTENSIONS_TO_FORMAT_KEY[extension]
+            except KeyError:
+                raise KeyError(
+                    f'File format not supported: {extension}'
+                )
+
+        def get_metadata(
+            dataset: Annotated[xr.Dataset, Depends(deps.get_dataset)],
+            cache: Annotated[cachey.Cache, Depends(deps.get_cache)],
+        ) -> FileMetadata:
+            """Gets and caches the metadata of the dataset."""
+            format_key = file_format(dataset)
+            grabber: FormatProtocol = self.loaded_formats[format_key]
+            return grabber.get_file_metadata(
+                dataset=dataset,
+                cache=cache,
+                hide_attrs=self.hide_attrs[format_key],
+            )
 
         @router.get('/attrs')
-        def get_attrs(
+        def attrs(
             dataset: Annotated[xr.Dataset, Depends(deps.get_dataset)],
         ) -> dict[str, str]:
             """Return the file attributes of the dataset."""
-            raise NotImplementedError
+            return get_metadata(dataset).attrs
+
+        @router.get('/attr-names')
+        def attr_names(
+            dataset: Annotated[xr.Dataset, Depends(deps.get_dataset)],
+        ) -> list[str]:
+            """Return the file attribute names of the dataset."""
+            return list(get_metadata(dataset).attrs.keys())
 
         @router.get('/attrs/{attr_name}')
-        def get_attr(
+        def single_attr(
             attr_name: str,
             dataset: Annotated[xr.Dataset, Depends(deps.get_dataset)],
         ) -> str:
             """Return the file attribute of the dataset."""
 
-            raise NotImplementedError
+            attrs = get_metadata(dataset).attrs
+            try:
+                return attrs[attr_name]
+            except KeyError:
+                raise HTTPException(
+                    status_code=404,
+                    detail=(
+                        f'Attribute not found: {attr_name}! '
+                        f'Use {self.dataset_router_prefix}/attr-names '
+                        f'to list available attributes.'
+                    ),
+                )
 
         return router
