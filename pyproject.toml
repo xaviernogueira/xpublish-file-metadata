@@ -9,13 +9,18 @@ packages = [{include = "xpublish_file_metadata"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 xpublish = "^0.3.2"
-netcdf4 = "^1.6.4"
 
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
 httpx = "^0.24.1"
 pytest-cov = "^4.1.0"
+
+[tool.poetry.extras]
+netcdf = ["netcdf4"]
+hdf5 = ["h5py"]
+geotiff = ["rasterio"]
+grib = ["cfgrib"]
 
 [build-system]
 requires = ["poetry-core"]
