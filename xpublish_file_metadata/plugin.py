@@ -144,7 +144,7 @@ class FileMetadataPlugin(Plugin):
                 )
         
         @router.get('/')
-        def get_metadata(
+        def metadata(
             dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
             cache: Annotated[cachey.Cache, Depends(deps.cache)],
         ) -> FileMetadata:
@@ -163,7 +163,7 @@ class FileMetadataPlugin(Plugin):
             cache: Annotated[cachey.Cache, Depends(deps.cache)],
         ) -> dict[str, str]:
             """Return the file attributes of the dataset."""
-            return get_metadata(dataset, cache).attrs
+            return metadata(dataset, cache).attrs
 
         @router.get('/attr-names')
         def attr_names(
@@ -172,7 +172,7 @@ class FileMetadataPlugin(Plugin):
         ) -> list[str]:
             """Return the file attribute names of the dataset."""
             return list(
-                get_metadata(
+                metadata(
                     dataset,
                     cache,
                 ).attrs.keys()
@@ -186,7 +186,7 @@ class FileMetadataPlugin(Plugin):
         ) -> str:
             """Return the file attribute of the dataset."""
 
-            attrs = get_metadata(dataset, cache).attrs
+            attrs = metadata(dataset, cache).attrs
             try:
                 return attrs[attr_name]
             except KeyError:
