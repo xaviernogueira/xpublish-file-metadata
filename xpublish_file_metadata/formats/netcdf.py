@@ -56,10 +56,12 @@ class NetcdfFileMetadata:
             nc_attr_names = [
                 i for i in list(nc_dataset.ncattrs()) if i not in hide_attrs
             ]
-            attrs_dict = dict(zip(
-                nc_attr_names,
-                [str(nc_dataset.getncattr(i)) for i in nc_attr_names],
-            ))
+            attrs_dict = dict(
+                zip(
+                    nc_attr_names,
+                    [str(nc_dataset.getncattr(i)) for i in nc_attr_names],
+                ),
+            )
             cache.put(
                 key=cache_key,
                 value=attrs_dict,

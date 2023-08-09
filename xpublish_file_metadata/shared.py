@@ -9,10 +9,12 @@ FileFormats: Literal = Literal[
     'grib',
 ]
 
+
 class FileMetadata(BaseModel):
     """File metadata model."""
     format: FileFormats
     attrs: dict[str, str]
+
 
 EXTENSIONS_TO_FORMAT_KEY: dict[str, FileFormats] = {
     '.nc': 'netcdf',

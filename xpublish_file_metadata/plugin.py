@@ -31,6 +31,7 @@ from .shared import (
 
 logger: logging.Logger = logging.getLogger('uvicorn')
 
+
 @runtime_checkable
 class FormatProtocol(Protocol):
     """Protocol for file metadata."""
@@ -54,12 +55,12 @@ def load_file_formats() -> dict[FileFormats, FormatProtocol]:
             metadata_grabber = entrypoint.load()
             if not entrypoint.name in get_args(FileFormats):
                 logger.warning(
-                    f'Skipping {entrypoint.name} support: Not a supported file format.'
+                    f'Skipping {entrypoint.name} support: Not a supported file format.',
                 )
                 continue
             if not isinstance(metadata_grabber, FormatProtocol):
                 logger.warning(
-                    f'Skipping {entrypoint.name} support: Plugin does not match protocol.'
+                    f'Skipping {entrypoint.name} support: Plugin does not match protocol.',
                 )
                 continue
 
@@ -67,7 +68,7 @@ def load_file_formats() -> dict[FileFormats, FormatProtocol]:
 
         except ImportError:
             logger.warning(
-                f'ImportError: {FORMAT_WARNINGS[entrypoint.name]}'
+                f'ImportError: {FORMAT_WARNINGS[entrypoint.name]}',
             )
     return loaded_formats
 
@@ -140,9 +141,9 @@ class FileMetadataPlugin(Plugin):
                 return EXTENSIONS_TO_FORMAT_KEY[extension]
             except KeyError:
                 raise KeyError(
-                    f'File format not supported: {extension}'
+                    f'File format not supported: {extension}',
                 )
-        
+
         @router.get('/')
         def metadata(
             dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
@@ -175,7 +176,7 @@ class FileMetadataPlugin(Plugin):
                 metadata(
                     dataset,
                     cache,
-                ).attrs.keys()
+                ).attrs.keys(),
             )
 
         @router.get('/attrs/{attr_name}')

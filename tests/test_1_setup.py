@@ -4,6 +4,7 @@ import xarray as xr
 
 import xpublish_file_metadata
 
+
 @pytest.fixture(scope='module')
 def test_formats() -> list[str]:
     """Return a list of optional dependencies that are installed."""
@@ -47,7 +48,7 @@ def test_server() -> xpublish.Rest:
 
 def test_plugin() -> None:
     assert 'FileMetadataPlugin' in dir(xpublish_file_metadata)
-    
+
     plugin = xpublish_file_metadata.FileMetadataPlugin()
     assert plugin.name == 'file-metadata'
     assert plugin.dataset_router_prefix == '/file-metadata'
@@ -61,8 +62,10 @@ def test_load_in(test_formats: list[str]) -> None:
     loaded_formats = xpublish_file_metadata.plugin.load_file_formats()
     for format in test_formats:
         assert format in loaded_formats.keys()
-        assert isinstance(loaded_formats[format], xpublish_file_metadata.plugin.FormatProtocol)
-    
+        assert isinstance(
+            loaded_formats[format], xpublish_file_metadata.plugin.FormatProtocol,
+        )
+
 
 def test_xpublish_compatibility(test_server: xpublish.Rest) -> None:
     """Tests that the plugin can be loaded into xpublish."""
@@ -71,6 +74,7 @@ def test_xpublish_compatibility(test_server: xpublish.Rest) -> None:
         test_server.plugins['file-metadata'],
         xpublish_file_metadata.FileMetadataPlugin,
     )
+
 
 def test_plugin_routes(test_server: xpublish.Rest) -> None:
     route_names = [route.name for route in test_server.app.routes]
