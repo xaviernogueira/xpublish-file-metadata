@@ -1722,4 +1722,4 @@ netcdf = ["netcdf4"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "a4e6b85d2a180d97fb179577bcac3105a8d97e4e065d19c304522468dd0e7304"
+content-hash = "6d82df3e8720eb636541f570327f6d06f293f13817a0d8d79e8cf111986e3643"
