@@ -60,12 +60,12 @@ For a variety of security reasons one may not want to expose all file metadata o
 Below are two examples using the `xpublish.Rest` syntax:
 
 ```python
-# to hide "history" attributes from all file formats
 import xpublish
 from xpublish_file_metadata import FileMetadataPlugin
 
 mock_dataset: xarray.Dataset = ...
 
+# to hide "history" attributes from all file formats
 xpublish.Rest(
     datasets={'my_data': mock_dataset},
     plugins=[
@@ -88,10 +88,10 @@ xpublish.Rest(
 
 ## Contributing
 
-Contributions are welcome! We encourage you to open an issue or pull request if you have any questions or suggestions.
+Contributions are welcome! We encourage you to open an issue or pull request if you have anything to request or add respectively.
 
-This project was developed using `poetry`. Start by installing `poetry` on your local machine, and use `poetry install` to install all dependencies. To run the test suite use `poetry run pytest`.
-
-Note that our `pytest` modules are located in the `tests` directory. Each can be ran individually (i.e., `poetry run pytest tests/test_2_netcdf.py`) if desired.
-
-Additionally, we encourage the use of [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/), which are simplified via the [VSCode extension](https://marketplace.visualstudio.com/items?itemName=vivaxy.vscode-conventional-commits).
+* This project was developed using `poetry`. Start by installing `poetry` on your local machine, and use `poetry install` to install all dependencies.
+* To run the test suite use `poetry run pytest`. Note that our `pytest` modules are located in the `tests` directory. Each can be ran individually (i.e., `poetry run pytest tests/test_2_netcdf.py`) if desired.
+* We use `pre-commit` for formatting. To run the pre-commit hooks locally (recommended) use `poetry run pre-commit`.
+* We encourage the use of [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/), which are simplified via the [VSCode extension](https://marketplace.visualstudio.com/items?itemName=vivaxy.vscode-conventional-commits).
+* In your pull request, please include a description of your changes and a link to the issue(s) your changes addresses.
