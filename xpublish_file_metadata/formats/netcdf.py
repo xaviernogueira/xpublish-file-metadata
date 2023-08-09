@@ -27,7 +27,7 @@ class NetcdfFileMetadata:
         nc_dataset = cache.get(cache_key)
 
         # otherwise open the netcdf dataset and cache it
-        nc_dataset = nc.Dataset(dataset.attrs['source'])
+        nc_dataset = nc.Dataset(dataset.encoding['source'])
         cache.put(
             key=cache_key,
             value=nc_dataset,
@@ -48,14 +48,9 @@ class NetcdfFileMetadata:
             '',
         ) + f'{self.format}/metadata'
 
-        file_metadata = cache.get(cache_key)
+        attrs_dict = cache.get(cache_key)
 
-        # protect against hidden attrs sneaking in via cache
-        for attr_name in hide_attrs:
-            if attr_name in file_metadata.attrs:
-                del file_metadata.attrs[attr_name]
-
-        if not file_metadata:
+        if not attrs_dict:
             nc_dataset = self.__get_nc_dataset(dataset, cache)
 
             nc_attr_names = [
@@ -70,7 +65,11 @@ class NetcdfFileMetadata:
                 value=attrs_dict,
                 cost=99999,
             )
-
+        # remove hidden attrs that may sneak in via cache
+        else:
+            for attr_name in hide_attrs:
+                if attr_name in attrs_dict.keys():
+                    del attrs_dict[attr_name]
         return FileMetadata(
             format=self.format,
             attrs=attrs_dict,

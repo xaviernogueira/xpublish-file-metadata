@@ -24,18 +24,12 @@ from typing import (
 )
 from .shared import (
     FileFormats,
+    FileMetadata,
     EXTENSIONS_TO_FORMAT_KEY,
     FORMAT_WARNINGS,
 )
 
 logger: logging.Logger = logging.getLogger('uvicorn')
-
-
-class FileMetadata(BaseModel):
-    """File metadata model."""
-    format: FileFormats
-    attrs: dict[str, str]
-
 
 @runtime_checkable
 class FormatProtocol(Protocol):
@@ -134,7 +128,7 @@ class FileMetadataPlugin(Plugin):
 
         @router.get('/format')
         def file_format(
-            dataset: Annotated[xr.Dataset, Depends(deps.get_dataset)],
+            dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
         ) -> str:
             """Return the file format of the dataset.
 
@@ -148,14 +142,15 @@ class FileMetadataPlugin(Plugin):
                 raise KeyError(
                     f'File format not supported: {extension}'
                 )
-
+        
+        @router.get('/')
         def get_metadata(
-            dataset: Annotated[xr.Dataset, Depends(deps.get_dataset)],
-            cache: Annotated[cachey.Cache, Depends(deps.get_cache)],
+            dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
+            cache: Annotated[cachey.Cache, Depends(deps.cache)],
         ) -> FileMetadata:
             """Gets and caches the metadata of the dataset."""
             format_key = file_format(dataset)
-            grabber: FormatProtocol = self.loaded_formats[format_key]
+            grabber: FormatProtocol = self.loaded_formats[format_key]()
             return grabber.get_file_metadata(
                 dataset=dataset,
                 cache=cache,
@@ -164,26 +159,34 @@ class FileMetadataPlugin(Plugin):
 
         @router.get('/attrs')
         def attrs(
-            dataset: Annotated[xr.Dataset, Depends(deps.get_dataset)],
+            dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
+            cache: Annotated[cachey.Cache, Depends(deps.cache)],
         ) -> dict[str, str]:
             """Return the file attributes of the dataset."""
-            return get_metadata(dataset).attrs
+            return get_metadata(dataset, cache).attrs
 
         @router.get('/attr-names')
         def attr_names(
-            dataset: Annotated[xr.Dataset, Depends(deps.get_dataset)],
+            dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
+            cache: Annotated[cachey.Cache, Depends(deps.cache)],
         ) -> list[str]:
             """Return the file attribute names of the dataset."""
-            return list(get_metadata(dataset).attrs.keys())
+            return list(
+                get_metadata(
+                    dataset,
+                    cache,
+                ).attrs.keys()
+            )
 
         @router.get('/attrs/{attr_name}')
         def single_attr(
             attr_name: str,
-            dataset: Annotated[xr.Dataset, Depends(deps.get_dataset)],
+            dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
+            cache: Annotated[cachey.Cache, Depends(deps.cache)],
         ) -> str:
             """Return the file attribute of the dataset."""
 
-            attrs = get_metadata(dataset).attrs
+            attrs = get_metadata(dataset, cache).attrs
             try:
                 return attrs[attr_name]
             except KeyError:
