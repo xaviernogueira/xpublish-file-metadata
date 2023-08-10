@@ -1715,7 +1715,7 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 
 [extras]
 geotiff = ["rasterio"]
-grib = ["cfgrib"]
+grib = ["cfgrib", "eccodes"]
 hdf5 = ["h5py"]
 netcdf = ["netcdf4"]
 
