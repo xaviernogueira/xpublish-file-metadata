@@ -20,7 +20,7 @@ A simple `xpublish` plugin for serving metadata from the underlying files `xarra
 ## Roadmap
 
 * [x] Add support for `netcdf` files
-* [ ] Add support for `geotiff` files
+* [x] Add support for `geotiff` files
 * [ ] Add support for `hdf5` files
 * [ ] Add support for `zarr` files
 
