@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "xpublish-file-metadata"
 version = "0.1.0"
-description = "A dataset router plugin for providing serving file metadata"
+description = "A dataset router plugin for serving file metadata"
 authors = ["xaviernogueira <xavier.rojas.nogueira@gmail.com>"]
 readme = "README.md"
 packages = [{include = "xpublish_file_metadata"}]
