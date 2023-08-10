@@ -4,7 +4,7 @@
 
 # xpublish-file-metadata
 
-A simple `xpublish` plugin for serving metadata from the underlying files `xarray` is reading from.
+A simple [`xpublish`](https://xpublish.readthedocs.io/) ["dataset router" plugin](https://xpublish.readthedocs.io/en/0.3.2/user-guide/plugins.html#dataset-router-plugins) for serving metadata from the underlying files `xarray` is reading from.
 
 **Note:** Zarr format metadata is already served by `xpublish` natively and is not handled by this plugin.
 
@@ -26,7 +26,7 @@ A simple `xpublish` plugin for serving metadata from the underlying files `xarra
 * [x] Add support for `netcdf` files
 * [x] Add support for `geotiff` files
 * [ ] Add support for `hdf5` files
-* [ ] Add support for `zarr` files
+* [ ] Add support for `GRIB` files
 
 ## Installation
 
