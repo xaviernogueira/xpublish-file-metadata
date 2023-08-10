@@ -1,3 +1,7 @@
+[![Pre-Commit Status](https://github.com/xaviernogueira/xpublish-file-metadata/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/xaviernogueira/xpublish-file-metadata/actions/workflows/pre-commit.yml)
+[![Tests Status](https://github.com/xaviernogueira/xpublish-file-metadata/actions/workflows/tests.yml/badge.svg)](https://github.com/xaviernogueira/xpublish-file-metadata/actions/workflows/tests.yml)
+[![Coverage](https://codecov.io/gh/xaviernogueira/xpublish-file-metadata/graph/badge.svg)](https://codecov.io/gh/xaviernogueira/xpublish-file-metadata)
+
 # xpublish-file-metadata
 
 A simple `xpublish` plugin for serving metadata from the underlying files `xarray` is reading from.
