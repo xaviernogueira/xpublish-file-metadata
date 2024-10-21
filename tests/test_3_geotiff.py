@@ -27,6 +27,7 @@ def answers() -> dict[str, str]:
         'height': '25',
         'count': '2920',
         'crs': 'None',
+        'blockxsize': '53',
         'tiled': 'False',
         'interleave': 'pixel',
         'IMAGE_STRUCTURE': str({
