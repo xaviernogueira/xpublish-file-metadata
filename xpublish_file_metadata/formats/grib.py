@@ -1,6 +1,7 @@
 import warnings
+
 with warnings.catch_warnings():
-    warnings.simplefilter('ignore', RuntimeWarning)
+    warnings.simplefilter("ignore", RuntimeWarning)
     try:
         import cfgrib
     except RuntimeError:
