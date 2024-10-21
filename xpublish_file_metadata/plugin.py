@@ -56,13 +56,15 @@ def load_file_formats() -> dict[FileFormats, FormatProtocol]:
             if not entrypoint.name in get_args(FileFormats):
                 logger.warning(
                     f'Skipping {
-                        entrypoint.name} support: Not a supported file format.',
+                        entrypoint.name
+                    } support: Not a supported file format.',
                 )
                 continue
             if not isinstance(metadata_grabber, FormatProtocol):
                 logger.warning(
                     f'Skipping {
-                        entrypoint.name} support: Plugin does not match protocol.',
+                        entrypoint.name
+                    } support: Plugin does not match protocol.',
                 )
                 continue
 
