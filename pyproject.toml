@@ -9,6 +9,8 @@ packages = [{include = "xpublish_file_metadata"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 xpublish = "^0.3.2"
+starlette = "^0.40.0"
+setuptools = "^70.0.0"
 netcdf4 = {version = "^1.6.4", optional = true}
 h5py = {version = "^3.9.0", optional = true}
 cfgrib = {version = "^0.9.10.4", optional = true}

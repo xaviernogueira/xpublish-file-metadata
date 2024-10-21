@@ -11,7 +11,7 @@ from ..shared import (
 class GeoTiffFileMetadata:
     """Get's file metadata for geotiff."""
 
-    format: FileFormats = 'geotiff'
+    format: FileFormats = "geotiff"
 
     def __read_attrs(
         self,
@@ -19,11 +19,11 @@ class GeoTiffFileMetadata:
         hide_attrs: list[str],
     ) -> dict:
         """Reads and combines the different rasterio attribute types."""
-        with rasterio.open(dataset.encoding['source'], mode='r') as tiff:
+        with rasterio.open(dataset.encoding["source"], mode="r") as tiff:
             attrs = tiff.profile
             for i, tag in enumerate(tiff.tag_namespaces()):
                 attrs[tag] = tiff.tags(i)
-            attrs['bounding_box'] = str(tiff.bounds)
+            attrs["bounding_box"] = str(tiff.bounds)
 
         for attr_name in list(attrs.keys()):
             if attr_name in hide_attrs:
@@ -39,10 +39,13 @@ class GeoTiffFileMetadata:
         hide_attrs: list[str],
     ) -> FileMetadata:
         """Return the file metadata of the dataset."""
-        cache_key = dataset.attrs.get(
-            DATASET_ID_ATTR_KEY,
-            '',
-        ) + f'{self.format}/metadata'
+        cache_key = (
+            dataset.attrs.get(
+                DATASET_ID_ATTR_KEY,
+                "",
+            )
+            + f"{self.format}/metadata"
+        )
 
         attrs_dict = cache.get(cache_key)
 

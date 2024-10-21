@@ -10,7 +10,8 @@ from ..shared import (
 
 class NetcdfFileMetadata:
     """Get's file metadata for netcdf."""
-    format: FileFormats = 'netcdf'
+
+    format: FileFormats = "netcdf"
 
     def __get_nc_dataset(
         self,
@@ -20,14 +21,17 @@ class NetcdfFileMetadata:
         """Return the netCDF4.Dataset object from an xarray.Dataset object."""
 
         # get the netcdf dataset from cache if cached
-        cache_key = dataset.attrs.get(
-            DATASET_ID_ATTR_KEY,
-            '',
-        ) + f'/{self.format}/dataset'
+        cache_key = (
+            dataset.attrs.get(
+                DATASET_ID_ATTR_KEY,
+                "",
+            )
+            + f"/{self.format}/dataset"
+        )
         nc_dataset = cache.get(cache_key)
 
         # otherwise open the netcdf dataset and cache it
-        nc_dataset = nc.Dataset(dataset.encoding['source'])
+        nc_dataset = nc.Dataset(dataset.encoding["source"])
         cache.put(
             key=cache_key,
             value=nc_dataset,
@@ -43,10 +47,13 @@ class NetcdfFileMetadata:
         hide_attrs: list[str],
     ) -> FileMetadata:
         """Return the file metadata of the dataset."""
-        cache_key = dataset.attrs.get(
-            DATASET_ID_ATTR_KEY,
-            '',
-        ) + f'{self.format}/metadata'
+        cache_key = (
+            dataset.attrs.get(
+                DATASET_ID_ATTR_KEY,
+                "",
+            )
+            + f"{self.format}/metadata"
+        )
 
         attrs_dict = cache.get(cache_key)
 

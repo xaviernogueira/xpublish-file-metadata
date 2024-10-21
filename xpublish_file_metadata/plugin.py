@@ -29,7 +29,7 @@ from .shared import (
     FORMAT_WARNINGS,
 )
 
-logger: logging.Logger = logging.getLogger('uvicorn')
+logger: logging.Logger = logging.getLogger("uvicorn")
 
 
 @runtime_checkable
@@ -50,17 +50,17 @@ def load_file_formats() -> dict[FileFormats, FormatProtocol]:
     """Load in file format sub-plugins."""
     loaded_formats: dict[FileFormats, FormatProtocol] = {}
 
-    for entrypoint in pkg_resources.iter_entry_points('xpublish_file_metadata.formats'):
+    for entrypoint in pkg_resources.iter_entry_points("xpublish_file_metadata.formats"):
         try:
             metadata_grabber = entrypoint.load()
             if not entrypoint.name in get_args(FileFormats):
                 logger.warning(
-                    f'Skipping {entrypoint.name} support: Not a supported file format.',
+                    f"Skipping {entrypoint.name} support: Not a supported file format.",
                 )
                 continue
             if not isinstance(metadata_grabber, FormatProtocol):
                 logger.warning(
-                    f'Skipping {entrypoint.name} support: Plugin does not match protocol.',
+                    f"Skipping {entrypoint.name} support: Plugin does not match protocol.",
                 )
                 continue
 
@@ -68,7 +68,7 @@ def load_file_formats() -> dict[FileFormats, FormatProtocol]:
 
         except ImportError:
             logger.warning(
-                f'ImportError: {FORMAT_WARNINGS[entrypoint.name]}',
+                f"ImportError: {FORMAT_WARNINGS[entrypoint.name]}",
             )
     return loaded_formats
 
@@ -76,10 +76,10 @@ def load_file_formats() -> dict[FileFormats, FormatProtocol]:
 class FileMetadataPlugin(Plugin):
     """File metadata plugin for xpublish."""
 
-    name: str = 'file-metadata'
+    name: str = "file-metadata"
 
-    dataset_router_prefix: str = '/file-metadata'
-    dataset_router_tags: Sequence[str] = ['file-metadata']
+    dataset_router_prefix: str = "/file-metadata"
+    dataset_router_tags: Sequence[str] = ["file-metadata"]
 
     def __init__(
         self,
@@ -113,13 +113,12 @@ class FileMetadataPlugin(Plugin):
         self,
         deps: Dependencies,
     ) -> APIRouter:
-
         router = APIRouter(
             prefix=self.dataset_router_prefix,
             tags=self.dataset_router_tags,
         )
 
-        @router.get('/supported')
+        @router.get("/supported")
         def supported_formats() -> list[str]:
             """Shows which file formats have metadata support.
 
@@ -127,7 +126,7 @@ class FileMetadataPlugin(Plugin):
             """
             return list(self.loaded_formats.keys())
 
-        @router.get('/format')
+        @router.get("/format")
         def file_format(
             dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
         ) -> str:
@@ -136,15 +135,15 @@ class FileMetadataPlugin(Plugin):
             NOTE: This is not the precise format, but rather the format key
             in relationship to the xpublish-file-metadata plugin.
             """
-            extension = Path(dataset.encoding['source']).suffix
+            extension = Path(dataset.encoding["source"]).suffix
             try:
                 return EXTENSIONS_TO_FORMAT_KEY[extension]
             except KeyError:
                 raise KeyError(
-                    f'File format not supported: {extension}',
+                    f"File format not supported: {extension}",
                 )
 
-        @router.get('/')
+        @router.get("/")
         def metadata(
             dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
             cache: Annotated[cachey.Cache, Depends(deps.cache)],
@@ -158,7 +157,7 @@ class FileMetadataPlugin(Plugin):
                 hide_attrs=self.hide_attrs[format_key],
             )
 
-        @router.get('/attrs')
+        @router.get("/attrs")
         def attrs(
             dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
             cache: Annotated[cachey.Cache, Depends(deps.cache)],
@@ -166,7 +165,7 @@ class FileMetadataPlugin(Plugin):
             """Return the file attributes of the dataset."""
             return metadata(dataset, cache).attrs
 
-        @router.get('/attr-names')
+        @router.get("/attr-names")
         def attr_names(
             dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
             cache: Annotated[cachey.Cache, Depends(deps.cache)],
@@ -179,7 +178,7 @@ class FileMetadataPlugin(Plugin):
                 ).attrs.keys(),
             )
 
-        @router.get('/attrs/{attr_name}')
+        @router.get("/attrs/{attr_name}")
         def single_attr(
             attr_name: str,
             dataset: Annotated[xr.Dataset, Depends(deps.dataset)],
@@ -194,9 +193,9 @@ class FileMetadataPlugin(Plugin):
                 raise HTTPException(
                     status_code=404,
                     detail=(
-                        f'Attribute not found: {attr_name}! '
-                        f'Use {self.dataset_router_prefix}/attr-names '
-                        f'to list available attributes.'
+                        f"Attribute not found: {attr_name}! "
+                        f"Use {self.dataset_router_prefix}/attr-names "
+                        f"to list available attributes."
                     ),
                 )
 
